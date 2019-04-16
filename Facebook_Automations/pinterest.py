@@ -22,11 +22,9 @@ def create_board(self, cmad):
 			'access_token':Constant.ACCESS_TOKEN}
 
 	response =  requests.post(url, data=data)
-	ar.write_social_media_api_calls("pinterest","create_board", "success", 1)
 	result  = json.loads(response.text)
-	locality_city = cmad.get_locality_name()+"_"+cmad.City
+	locality_city = "Sector 11_Nooda"
 	print "Response :  ", response.text
-	save_board_details(board_name , result['data']['id'], result['data']['url'], locality_city)
 	return result['data']['name']
 
 
