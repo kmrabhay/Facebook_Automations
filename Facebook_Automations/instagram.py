@@ -1,19 +1,20 @@
+from rest_framework.renderers import JSONRenderer
+from ott.models import OttGroup, OttMessage
 from datetime import timedelta
 from datetime import datetime
-# from analytics.analyticsrecorder import MeasurementName,Constants,TagsName,FieldName,AnalyticsRecord
-# from django.utils import timezone
+from analytics.analyticsrecorder import MeasurementName,Constants,TagsName,FieldName,AnalyticsRecord
+from django.utils import timezone
+from mongoengine.queryset.visitor import Q
 import requests
-# import logging
-# import urllib2
-
-# ar =  AnalyticsRecord()
+import logging
+import urllib2
 
 class Constant():
     api_base_url = "https://graph.facebook.com"
     auth_code_url = api_base_url+"/oauth/authorize/"
     access_token_url = api_base_url+"/oauth/access_token"
     feed_connection = "/feed"
-    ACCESS_TOKEN = "EAAFToPQuPTEBAJyUY5raasQW0s0nnaZA16ZCvIPKyovbhFYOLbEQ1zTor3MeiOnZAPQfBGu4ayKLWOnZA1KiBxRjZAOtOg5Fhu1ZBkfZAr8JNthNLD66aAHXzLGmvfisk2nTMZAx5OCbEWjeaIbS9XDCY6KCdXq7KENzBh1MMiohjWR82f6BNG08rvmv8JokUs0yDbWpDNPZAeAZDZD"
+    ACCESS_TOKEN = "EAAjZBJa4A31YBAKSnwJJCD55SLsgZBKUjUzEIqvA3z2VMLiReA9wAdazrFbCmFZBNZB5OBxZB91X833fZCPnUZA80fx4S3cmrGlORji6hu5aaPzEAiKkLZCZCfZA4V85ZBEZCPeCHMD8mBXurBcOQJgNd1VnybUhSxw5JcFQuyZAJx1W8yAZDZD"
     user_id = "/me"
     version = "/v3.2"
     client_id = "808fb92577244e6292a2b536147f19ce"
@@ -25,9 +26,10 @@ class Constant():
     response_type = code
     read_media_api = "https://api.instagram.com/v1/users/self/media/recent/?access_token=11568692993.808fb92.74d1f9342f994241901688f66b73bce0"
     FB_PAGE_ID = '/373122386749686'
-    INSTA_BUSINESS_ACCOUNT_ID="/xxxxxxxxxxx"
+    INSTA_BUSINESS_ACCOUNT_ID="/17841409597243611"
     MEDIA_OBJECT_CONTAINER_ENDPOINT = "/media"
     PUBLISH_MEDIA_OBJECT_ENDPOINT = '/media_publish'
+
 class Helper():
     def __init__(self):
         pass
@@ -42,8 +44,9 @@ class Instagram(object):
         try:
             url =  Constant.api_base_url+Constant.version+Constant.INSTA_BUSINESS_ACCOUNT_ID+Constant.MEDIA_OBJECT_CONTAINER_ENDPOINT
             print url
-            data = {"media_url": "image url", "caption":"Image title and description"}
+            data = {"image_url": 'http://img.multiplymyleads.com/images/logo_mml.jpg', "caption":"Image title and description"}
             response = requests.post(url, data=data)
+            print response
             print response.text
             # ar.write_social_media_api_calls("instagram","media_object_container", "success", 1)
             return response.text['creation_id']
@@ -55,8 +58,10 @@ class Instagram(object):
     def publish_media_container_to_instagram(self, creation_id):
         url =  Constant.api_base_url+Constant.version+Constant.INSTA_BUSINESS_ACCOUNT_ID+Constant.PUBLISH_MEDIA_OBJECT_ENDPOINT
         print url
+
         data = {"creation_id": creation_id}
         response = requests.post(url, data=data)
+        print response
         print response.text
         # ar.write_social_media_api_calls("instagram","media_publish", "success", 1)
         return
@@ -88,14 +93,19 @@ class Instagram(object):
             logging.getLogger("cinfo_log").exception("Exception in facebook automation")
 
 
-Instagram().instagram()
+# Instagram().instagram()
 
 #****Output of above scripts*****
 
-'''https://graph.facebook.com/v3.2/xxxxxxxxxxx/media
-{"error":{"message":"(#803) Cannot query users by their username (xxxxxxxxxxx)","type":"OAuthException","code":803,"fbtrace_id":"FeQWJLdCCbf"}}
-string indices must be integers
-https://graph.facebook.com/v3.2/xxxxxxxxxxx/media_publish
-{"error":{"message":"(#803) Cannot query users by their username (xxxxxxxxxxx)","type":"OAuthException","code":803,"fbtrace_id":"Ap2PHeECBJi"}}
 '''
+(venv) abhay@Abhay:~/mml/mml-dev$ python manage.py instagram_postings
+https://graph.facebook.com/v3.2/17841409597243611/media
+<Response [400]>
+{"error":{"message":"Unsupported post request. Object with ID '17841409597243611' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https:\/\/developers.facebook.com\/docs\/graph-api","type":"GraphMethodException","code":100,"error_subcode":33,"fbtrace_id":"Bd6lNOxF+hS"}}
+string indices must be integers
+https://graph.facebook.com/v3.2/17841409597243611/media_publish
+<Response [400]>
+{"error":{"message":"(#100) The parameter creation_id is required.","type":"OAuthException","code":100,"fbtrace_id":"Axsiz6WnJGV"}}
 
+
+'''
